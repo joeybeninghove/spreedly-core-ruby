@@ -4,23 +4,22 @@ module SpreedlyCore
   # Base class for all SpreedlyCore API requests
   class Base
     include HTTParty
-    
+
     # Net::HTTP::Options is configured to not have a body.
     # Lets give it the body it's always dreamed of
     old_verbose, $VERBOSE = $VERBOSE, nil
     Net::HTTP::Options::RESPONSE_HAS_BODY = true
     $VERBOSE = old_verbose
-    
+
     format :xml
 
     # timeout requests after 10 seconds
     default_timeout 10
 
-    base_uri "https://spreedlycore.com/#{SpreedlyCore::API_VERSION}"
-
     def self.configure(login, secret, options = {})
       @@login = login
       self.basic_auth(@@login, secret)
+      base_uri options[:endpoint]
       @@gateway_token = options.delete(:gateway_token)
     end
 
@@ -31,7 +30,7 @@ module SpreedlyCore
     # make a post request to path
     # If the request succeeds, provide the respones to the &block
     def self.verify_post(path, options={}, &block)
-      verify_request(:post, path, options, 200, 201, 422, &block)
+      verify_request(:post, path, options, 200, 201, 202, 422, &block)
     end
 
     # make a put request to path
@@ -58,12 +57,12 @@ module SpreedlyCore
     # If *allowed_codes is empty, don't check the response code, but set an instance
     # variable on the object created in the block containing the response code.
     def self.verify_request(request_type, path, options, *allowed_codes, &block)
-      begin 
+      begin
         response = self.send(request_type, path, options)
       rescue Timeout::Error, Errno::ETIMEDOUT => e
         raise TimeOutError.new("Request to #{path} timed out. Is Spreedly Core down?")
       end
-        
+
       if allowed_codes.any? && !allowed_codes.include?(response.code)
         raise InvalidResponse.new(response, "Error retrieving #{path}. Got status of #{response.code}. Expected status to be in #{allowed_codes.join(",")}")
       end
@@ -89,7 +88,7 @@ module SpreedlyCore
       attrs.each do |k, v|
         instance_variable_set("@#{k}", v)
       end
-      # errors may be nil, empty, a string, or an array of strings. 
+      # errors may be nil, empty, a string, or an array of strings.
       @errors = if @errors.nil? || @errors["error"].blank?
                   []
                 elsif @errors["error"].is_a?(String)
