@@ -2,7 +2,7 @@ module SpreedlyCore
   class Gateway < Base
     attr_reader(:name, :token, :gateway_type, :auth_modes, :supports_capture,
                 :supports_authorize, :supports_purchase, :supports_void,
-                :supports_credit, :supports_offsite_purchase, :redacted)
+                :supports_credit, :supports_offsite_purchase, :redacted, :payment_methods)
 
     # returns an array of Gateway which are supported
     def self.supported_gateways
