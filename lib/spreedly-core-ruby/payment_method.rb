@@ -31,12 +31,6 @@ module SpreedlyCore
       end
     end
 
-    def self.create_offsite(payment_method_type)
-      verify_post("/payment_methods.xml", :body => {:payment_method_type => payment_method_type}) do |response|
-        AddPaymentMethodTransaction.new(response.parsed_response["transaction"])
-      end
-    end
-
     # Create a new PaymentMethod based on the attrs hash and then validate
     def initialize(attrs={})
       super(attrs)
