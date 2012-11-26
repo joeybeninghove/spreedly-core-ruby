@@ -26,7 +26,15 @@ module SpreedlyCore
   # See SpreedlyCore::Base.default_timeout
   class TimeOutError < Error; end
   class InvalidResponse < Error
+    attr_accessor :errors
+
     def initialize(response, message)
+      parsed_response = response.parsed_response
+
+      if !parsed_response.nil? && parsed_response.has_key?("errors")
+        @errors = parsed_response["errors"]["error"]
+      end
+
       super("#{message}\nResponse:\n#{response.inspect}")
     end
   end
