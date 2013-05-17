@@ -29,11 +29,11 @@ module SpreedlyCore
     attr_accessor :errors
 
     def initialize(response, message)
-      parsed_response = response.parsed_response
+      #parsed_response = response.parsed_response
 
-      if !parsed_response.nil? && parsed_response.has_key?("errors")
-        @errors = parsed_response["errors"]["error"]
-      end
+      #if !parsed_response.nil? && parsed_response.has_key?("errors")
+      #  @errors = parsed_response["errors"]["error"]
+      #end
 
       super("#{message}\nResponse:\n#{response.inspect}")
     end
