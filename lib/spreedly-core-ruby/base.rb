@@ -14,7 +14,7 @@ module SpreedlyCore
     format :xml
 
     # timeout requests after 10 seconds
-    default_timeout 10
+    default_timeout 60
 
     def self.configure(login, secret, options = {})
       @@login = login
